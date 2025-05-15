@@ -24,6 +24,8 @@ import Settings from "./pages/investor/Settings";
 import Users from "./pages/admin/Users";
 import DataSources from "./pages/admin/DataSources";
 import MLModels from "./pages/admin/MLModels";
+import AdminAlerts from "./pages/admin/Alerts";
+import AdminSettings from "./pages/admin/Settings";
 
 // Layout Components
 import DashboardLayout from "./components/dashboard/DashboardLayout";
@@ -42,7 +44,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Dashboard Routes */}
+          {/* Investor Dashboard Routes */}
           <Route path="/" element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Stocks />} />
             <Route path="/portfolio" element={<Portfolio />} />
@@ -57,6 +59,8 @@ const App = () => (
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/data-sources" element={<DataSources />} />
             <Route path="/admin/ml-models" element={<MLModels />} />
+            <Route path="/admin/alerts" element={<AdminAlerts />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
           </Route>
           
           {/* Catch-all Route */}

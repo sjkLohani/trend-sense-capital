@@ -15,7 +15,8 @@ import {
   Database,
   FileBarChart,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -76,9 +77,19 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isAdmin = false }: SidebarProps)
       icon: <FileBarChart size={20} />, 
       path: '/admin/ml-models' 
     },
+    { 
+      name: 'Alerts', 
+      icon: <AlertTriangle size={20} />, 
+      path: '/admin/alerts' 
+    },
+    { 
+      name: 'Settings', 
+      icon: <Settings size={20} />, 
+      path: '/admin/settings' 
+    },
   ];
 
-  const links = isAdmin ? [...investorLinks, ...adminLinks] : investorLinks;
+  const links = isAdmin ? adminLinks : investorLinks;
 
   return (
     <div 
