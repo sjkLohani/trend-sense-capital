@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -14,28 +14,54 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const LoginForm = () => {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [rememberMe, setRememberMe] = React.useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [userRole, setUserRole] = useState<'investor' | 'admin'>('investor');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate login - in a real app, this would be an API call
+    // Mock credentials for demonstration
+    const validInvestorCredentials = { email: 'investor@example.com', password: 'password123' };
+    const validAdminCredentials = { email: 'admin@example.com', password: 'admin123' };
+    
+    // Check if credentials are valid based on selected role
+    const isValid = userRole === 'investor' 
+      ? (email === validInvestorCredentials.email && password === validInvestorCredentials.password)
+      : (email === validAdminCredentials.email && password === validAdminCredentials.password);
+    
     setTimeout(() => {
-      // Mock successful login
-      toast({
-        title: "Login successful",
-        description: "Redirecting to your dashboard...",
-      });
       setIsLoading(false);
-      // Redirect would happen here
-    }, 1500);
+      
+      if (isValid) {
+        // Successful login
+        toast({
+          title: "Login successful",
+          description: "Redirecting to your dashboard...",
+        });
+        
+        // Redirect to the appropriate dashboard based on role
+        setTimeout(() => {
+          navigate(userRole === 'investor' ? '/dashboard' : '/admin/users');
+        }, 1000);
+      } else {
+        // Failed login
+        toast({
+          title: "Login failed",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive"
+        });
+      }
+    }, 1000);
   };
 
   return (
@@ -45,6 +71,18 @@ const LoginForm = () => {
         <CardDescription>
           Enter your credentials to access your account
         </CardDescription>
+        
+        <Tabs 
+          defaultValue="investor" 
+          className="w-full mt-2"
+          value={userRole}
+          onValueChange={(value) => setUserRole(value as 'investor' | 'admin')}
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="investor">Investor</TabsTrigger>
+            <TabsTrigger value="admin">Administrator</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -53,7 +91,7 @@ const LoginForm = () => {
             <Input 
               id="email" 
               type="email" 
-              placeholder="name@example.com" 
+              placeholder={userRole === 'investor' ? 'investor@example.com' : 'admin@example.com'} 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -72,6 +110,7 @@ const LoginForm = () => {
             <Input 
               id="password" 
               type="password"
+              placeholder={userRole === 'investor' ? 'password123' : 'admin123'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -132,6 +171,24 @@ const LoginForm = () => {
           </Link>
         </p>
       </CardFooter>
+      
+      {/* Demo credentials */}
+      <div className="px-6 pb-4 pt-0">
+        <div className="bg-muted/50 rounded-md p-3">
+          <p className="text-xs font-medium mb-1">Demo Credentials</p>
+          {userRole === 'investor' ? (
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>Email: investor@example.com</p>
+              <p>Password: password123</p>
+            </div>
+          ) : (
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>Email: admin@example.com</p>
+              <p>Password: admin123</p>
+            </div>
+          )}
+        </div>
+      </div>
     </Card>
   );
 };

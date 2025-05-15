@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
   Menu, 
@@ -12,7 +12,39 @@ import {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This would come from auth context in real app
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const location = useLocation();
+  
+  // Check if we're on the landing page
+  const isLandingPage = location.pathname === '/';
+
+  // Scroll handler function for smooth scrolling to sections
+  const handleSectionScroll = (sectionId: string) => {
+    if (!isLandingPage) {
+      // If not on landing page, navigate to home page with hash
+      window.location.href = `/#${sectionId}`;
+      return;
+    }
+    
+    // Get the element to scroll to
+    const element = document.getElementById(sectionId);
+    if (element) {
+      // Close mobile menu if open
+      setIsOpen(false);
+      
+      // Scroll smoothly to the element
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+  
+  // Check local storage for authentication status on component mount
+  useEffect(() => {
+    const loginStatus = localStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedIn(loginStatus);
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b py-4 px-6">
@@ -24,11 +56,30 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-foreground/80 hover:text-primary transition">Home</Link>
-          <Link to="/features" className="text-foreground/80 hover:text-primary transition">Features</Link>
-          <Link to="/pricing" className="text-foreground/80 hover:text-primary transition">Pricing</Link>
-          <Link to="/about" className="text-foreground/80 hover:text-primary transition">About</Link>
-          <Link to="/contact" className="text-foreground/80 hover:text-primary transition">Contact</Link>
+          <button 
+            onClick={() => handleSectionScroll('features')} 
+            className="text-foreground/80 hover:text-primary transition"
+          >
+            Features
+          </button>
+          <button 
+            onClick={() => handleSectionScroll('pricing')} 
+            className="text-foreground/80 hover:text-primary transition"
+          >
+            Pricing
+          </button>
+          <button 
+            onClick={() => handleSectionScroll('how-it-works')} 
+            className="text-foreground/80 hover:text-primary transition"
+          >
+            About
+          </button>
+          <button 
+            onClick={() => handleSectionScroll('contact')} 
+            className="text-foreground/80 hover:text-primary transition"
+          >
+            Contact
+          </button>
           
           {isLoggedIn ? (
             <div className="flex items-center space-x-4">
@@ -69,11 +120,30 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden fixed inset-0 top-16 bg-background z-40 p-6">
           <div className="flex flex-col space-y-6">
-            <Link to="/" className="text-lg font-medium" onClick={() => setIsOpen(false)}>Home</Link>
-            <Link to="/features" className="text-lg font-medium" onClick={() => setIsOpen(false)}>Features</Link>
-            <Link to="/pricing" className="text-lg font-medium" onClick={() => setIsOpen(false)}>Pricing</Link>
-            <Link to="/about" className="text-lg font-medium" onClick={() => setIsOpen(false)}>About</Link>
-            <Link to="/contact" className="text-lg font-medium" onClick={() => setIsOpen(false)}>Contact</Link>
+            <button 
+              onClick={() => handleSectionScroll('features')} 
+              className="text-lg font-medium"
+            >
+              Features
+            </button>
+            <button 
+              onClick={() => handleSectionScroll('pricing')} 
+              className="text-lg font-medium"
+            >
+              Pricing
+            </button>
+            <button 
+              onClick={() => handleSectionScroll('how-it-works')} 
+              className="text-lg font-medium"
+            >
+              About
+            </button>
+            <button 
+              onClick={() => handleSectionScroll('contact')} 
+              className="text-lg font-medium"
+            >
+              Contact
+            </button>
             
             <div className="flex flex-col space-y-4 pt-4 border-t">
               {isLoggedIn ? (

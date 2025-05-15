@@ -12,6 +12,19 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
+// Investor Pages
+import Stocks from "./pages/investor/Stocks";
+import Portfolio from "./pages/investor/Portfolio";
+import SentimentAnalysis from "./pages/investor/SentimentAnalysis";
+import Predictions from "./pages/investor/Predictions";
+import Alerts from "./pages/investor/Alerts";
+import Settings from "./pages/investor/Settings";
+
+// Admin Pages
+import Users from "./pages/admin/Users";
+import DataSources from "./pages/admin/DataSources";
+import MLModels from "./pages/admin/MLModels";
+
 // Layout Components
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 
@@ -31,19 +44,19 @@ const App = () => (
           
           {/* Dashboard Routes */}
           <Route path="/" element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/portfolio" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/sentiment" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/predictions" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/alerts" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/settings" element={<Dashboard />} /> {/* Placeholder */}
+            <Route path="/dashboard" element={<Stocks />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/sentiment" element={<SentimentAnalysis />} />
+            <Route path="/predictions" element={<Predictions />} />
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
           
           {/* Admin Routes */}
           <Route path="/" element={<DashboardLayout isAdmin={true} />}>
-            <Route path="/admin/users" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/admin/data-sources" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/admin/ml-models" element={<Dashboard />} /> {/* Placeholder */}
+            <Route path="/admin/users" element={<Users />} />
+            <Route path="/admin/data-sources" element={<DataSources />} />
+            <Route path="/admin/ml-models" element={<MLModels />} />
           </Route>
           
           {/* Catch-all Route */}
