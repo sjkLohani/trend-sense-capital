@@ -210,7 +210,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: "Please check your email for the confirmation link.",
       });
       
-      return data;
+      // Return void to match the function signature
+      return;
     } catch (error: any) {
       console.error('Error signing up:', error.message);
       throw error;
