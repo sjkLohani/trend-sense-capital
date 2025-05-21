@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,9 +13,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
-import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -23,45 +23,37 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [userRole, setUserRole] = useState<'investor' | 'admin'>('investor');
+  const { signIn } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Mock credentials for demonstration
-    const validInvestorCredentials = { email: 'investor@example.com', password: 'password123' };
-    const validAdminCredentials = { email: 'admin@example.com', password: 'admin123' };
-    
-    // Check if credentials are valid based on selected role
-    const isValid = userRole === 'investor' 
-      ? (email === validInvestorCredentials.email && password === validInvestorCredentials.password)
-      : (email === validAdminCredentials.email && password === validAdminCredentials.password);
-    
-    setTimeout(() => {
+    try {
+      await signIn(email, password);
+      // No need to navigate here, it's handled in the AuthContext
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid email or password. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-      
-      if (isValid) {
-        // Successful login
-        toast({
-          title: "Login successful",
-          description: "Redirecting to your dashboard...",
-        });
-        
-        // Redirect to the appropriate dashboard based on role
-        setTimeout(() => {
-          navigate(userRole === 'investor' ? '/dashboard' : '/admin/users');
-        }, 1000);
-      } else {
-        // Failed login
-        toast({
-          title: "Login failed",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive"
-        });
-      }
-    }, 1000);
+    }
+  };
+
+  // Helper to fill demo credentials
+  const fillDemoCredentials = (role: 'investor' | 'admin') => {
+    if (role === 'investor') {
+      setEmail('investor@example.com');
+      setPassword('password123');
+    } else {
+      setEmail('admin@example.com');
+      setPassword('admin123');
+    }
+    setUserRole(role);
   };
 
   return (
@@ -79,8 +71,8 @@ const LoginForm = () => {
           onValueChange={(value) => setUserRole(value as 'investor' | 'admin')}
         >
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="investor">Investor</TabsTrigger>
-            <TabsTrigger value="admin">Administrator</TabsTrigger>
+            <TabsTrigger value="investor" onClick={() => fillDemoCredentials('investor')}>Investor</TabsTrigger>
+            <TabsTrigger value="admin" onClick={() => fillDemoCredentials('admin')}>Administrator</TabsTrigger>
           </TabsList>
         </Tabs>
       </CardHeader>

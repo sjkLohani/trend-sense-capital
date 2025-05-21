@@ -3,6 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   LayoutDashboard, 
   PieChart, 
@@ -27,6 +28,7 @@ interface SidebarProps {
 
 const Sidebar = ({ isCollapsed, setIsCollapsed, isAdmin = false }: SidebarProps) => {
   const location = useLocation();
+  const { signOut } = useAuth();
   
   const investorLinks = [
     { 
@@ -91,6 +93,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isAdmin = false }: SidebarProps)
 
   const links = isAdmin ? adminLinks : investorLinks;
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   return (
     <div 
       className={cn(
@@ -147,16 +157,16 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isAdmin = false }: SidebarProps)
       
       {/* Sidebar Footer */}
       <div className="border-t p-4">
-        <Link
-          to="/logout"
+        <button
+          onClick={handleLogout}
           className={cn(
-            "flex items-center px-3 py-2.5 rounded-md font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:bg-opacity-50 transition-colors",
+            "flex items-center px-3 py-2.5 rounded-md font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:bg-opacity-50 transition-colors w-full",
             isCollapsed && "justify-center"
           )}
         >
           <LogOut size={20} className="mr-3" />
           {!isCollapsed && <span>Logout</span>}
-        </Link>
+        </button>
       </div>
     </div>
   );

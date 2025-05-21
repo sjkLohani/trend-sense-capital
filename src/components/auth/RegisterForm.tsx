@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,19 +20,21 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 const RegisterForm = () => {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [confirmPassword, setConfirmPassword] = React.useState('');
-  const [fullName, setFullName] = React.useState('');
-  const [investorType, setInvestorType] = React.useState('');
-  const [termsAccepted, setTermsAccepted] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [investorType, setInvestorType] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { signUp } = useAuth();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -55,15 +57,17 @@ const RegisterForm = () => {
     
     setIsLoading(true);
     
-    // Simulate registration - in a real app, this would be an API call
-    setTimeout(() => {
-      toast({
-        title: "Registration successful",
-        description: "Your account has been created. Please check your email for verification.",
+    try {
+      await signUp(email, password, {
+        full_name: fullName,
+        investor_type: investorType,
       });
+      // Redirect is handled in the AuthContext
+    } catch (error) {
+      // Error is handled in the AuthContext
+    } finally {
       setIsLoading(false);
-      // Redirect would happen here
-    }, 1500);
+    }
   };
 
   return (

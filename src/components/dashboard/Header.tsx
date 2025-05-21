@@ -6,6 +6,7 @@ import {
   Search,
   User,
   ChevronDown,
+  LogOut,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
   isCollapsed: boolean;
@@ -28,6 +30,7 @@ const Header = ({ isCollapsed }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+  const { profile, signOut } = useAuth();
   
   // Check if current path is admin route
   const isAdmin = location.pathname.includes('/admin');
@@ -72,6 +75,25 @@ const Header = ({ isCollapsed }: HeaderProps) => {
       navigate(`/${route}`);
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!profile || !profile.full_name) return "U";
+    
+    const names = profile.full_name.split(' ');
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return names[0][0].toUpperCase();
+  };
   
   return (
     <header 
@@ -109,11 +131,11 @@ const Header = ({ isCollapsed }: HeaderProps) => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center space-x-2">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary/10 text-primary">JD</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary">{getUserInitials()}</AvatarFallback>
               </Avatar>
               <div className="flex items-center">
                 <span className="mr-1 text-sm font-medium hidden sm:inline-block">
-                  {isAdmin ? "Admin User" : "John Doe"}
+                  {profile?.full_name || (isAdmin ? "Admin User" : "User")}
                 </span>
                 <ChevronDown size={16} />
               </div>
@@ -128,7 +150,10 @@ const Header = ({ isCollapsed }: HeaderProps) => {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleProfileClick('settings')}>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/login')}>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

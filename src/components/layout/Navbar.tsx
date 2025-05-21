@@ -1,19 +1,22 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
   Menu, 
   X, 
   BarChart, 
   LogIn,
-  User
+  User,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, signOut, isAdmin } = useAuth();
   
   // Check if we're on the landing page
   const isLandingPage = location.pathname === '/';
@@ -39,12 +42,20 @@ const Navbar = () => {
       });
     }
   };
-  
-  // Check local storage for authentication status on component mount
-  useEffect(() => {
-    const loginStatus = localStorage.getItem('isLoggedIn') === 'true';
-    setIsLoggedIn(loginStatus);
-  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
+  const handleDashboardClick = () => {
+    navigate(isAdmin ? '/admin/users' : '/dashboard');
+    setIsOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b py-4 px-6">
@@ -81,16 +92,14 @@ const Navbar = () => {
             Contact
           </button>
           
-          {isLoggedIn ? (
+          {user ? (
             <div className="flex items-center space-x-4">
-              <Link to="/dashboard">
-                <Button variant="outline">Dashboard</Button>
-              </Link>
-              <Link to="/profile">
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
+              <Button variant="outline" onClick={handleDashboardClick}>
+                Dashboard
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleLogout}>
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
           ) : (
             <div className="flex items-center space-x-4">
@@ -146,14 +155,14 @@ const Navbar = () => {
             </button>
             
             <div className="flex flex-col space-y-4 pt-4 border-t">
-              {isLoggedIn ? (
+              {user ? (
                 <>
-                  <Link to="/dashboard" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full">Dashboard</Button>
-                  </Link>
-                  <Link to="/profile" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" className="w-full">Profile</Button>
-                  </Link>
+                  <Button className="w-full" onClick={handleDashboardClick}>
+                    Dashboard
+                  </Button>
+                  <Button variant="outline" className="w-full" onClick={handleLogout}>
+                    Logout
+                  </Button>
                 </>
               ) : (
                 <>
